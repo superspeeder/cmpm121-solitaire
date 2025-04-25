@@ -1,6 +1,7 @@
 ---@class Card
 ---@field suit Suit
 ---@field rank integer
+---@field magic integer
 Card = {width = 64, height = 96}
 Card.mt = {__index=Card}
 
@@ -61,6 +62,7 @@ function Card:new(suit, rank)
     setmetatable(o, Card.mt)
     o.suit = suit
     o.rank = rank
+    o.magic = MAGIC_CARD
     return o
 end
 
@@ -104,6 +106,10 @@ function Card:draw(position, dt, faceUp, shadowOffset)
 
 end
 
+function Card:drawGrabbed(dt, position)
+    self:draw(position, dt, true, 4)
+end
+
 function Card:canStackOnTopOf(other)
     return (self.suit % 2 ~= other.suit % 2) and other.rank - self.rank == 1
 end
@@ -132,3 +138,4 @@ end
 function PlacedCard:draw(dt)
     self.card:draw(self.position, dt, self.faceUp)
 end
+

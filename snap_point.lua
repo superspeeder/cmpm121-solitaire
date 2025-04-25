@@ -14,7 +14,7 @@ function SnapPoint:new(position)
 end
 
 ---Check if a card can be placed on this snap point
----@param card Card
+---@param card Card | Tableau
 ---@return boolean
 function SnapPoint:canPlaceCard(card)
     return true
@@ -35,5 +35,14 @@ function SnapPoint:containsPoint(point)
     return point.x >= self.position.x and point.x <= (self.position.x + Card.width) and point.y >= self.position.y and point.y <= (self.position.y + Card.height)
 end
 
+---Base function for clicking a snap point without holding a card
+---@return boolean status Did this function do anything? Used for passthrough control
 function SnapPoint:clickedEmpty(point)
+    return false
+end
+
+---Place a card in this snap point
+---@param card Card | Tableau
+function SnapPoint:placeCard(card)
+    error("Cannot call the default snap point implementation") -- This function is abstract and is here to be overriden by subclasses which actually manage this
 end

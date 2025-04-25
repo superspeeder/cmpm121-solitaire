@@ -1,7 +1,10 @@
+require("magic") 
 require("vector")
 require("entity")
 require("card")
 require("snap_point")
+require("grab")
+require("draw_pile")
 require("deck")
 require("tableau")
 require("suit_pile")
@@ -25,12 +28,23 @@ local suitPiles = {
     [SUITS.CLUBS] = SuitPile:new(SUITS.CLUBS, Vector:new(650, 380))
 }
 
+---@type DrawPile
+local drawPile = nil
+
+---@type Grab
+local grab = nil
+
 function love.load()
     love.graphics.setDefaultFilter("nearest", "nearest")
 
-    Card.setupSprites();
+    Card.setupSprites()
 
-    local deck = Deck:new()
+    grab = Grab:new()
+
+    drawPile = DrawPile:new(Vector:new(130, 50))
+    table.insert(entities, drawPile)
+
+    local deck = Deck:new(drawPile)
     deck:shuffle();
 
     table.insert(entities, DeckEntity:new(deck, Vector:new(50, 50)))
@@ -47,6 +61,8 @@ function love.load()
     table.insert(entities, suitPiles[SUITS.SPADES]);
     table.insert(entities, suitPiles[SUITS.DIAMONDS]);
     table.insert(entities, suitPiles[SUITS.CLUBS]);
+
+    table.insert(entities, grab)
 
     love.graphics.setBackgroundColor(GAME_BACKGROUND)
 end
@@ -74,7 +90,59 @@ function love.draw(dt)
         entity:draw(dt)
     end
 
-    if hoveredSnapPoint ~= nil then
+    if hoveredSnapPoint ~= nil and grab.grabbedCard ~= nil then
         hoveredSnapPoint:drawOverlay()
+    end
+end
+
+function grabhelper(mousePosition)
+    for _, entity in ipairs(entities) do
+        local eGrabPoints = entity:getGrabPoints()
+        for _, gp in ipairs(eGrabPoints) do
+            if gp:canGrabFrom(mousePosition) then
+                grab:grab(gp, mousePosition)
+                return
+            end
+        end
+    end
+end
+
+function love.mousepressed(x, y)
+    if grab.grabbedCard ~= nil then
+        return -- if we are holding a card, do nothing
+    end
+
+
+    local mousePosition = Vector(x, y)
+
+    for _, entity in ipairs(entities) do
+        local snapPoint = entity:getSnapPoint()
+        if snapPoint ~= nil and snapPoint:containsPoint(mousePosition) then
+            hoveredSnapPoint = snapPoint
+        end
+    end
+
+    local status = false
+    if hoveredSnapPoint ~= nil then
+        status = hoveredSnapPoint:clickedEmpty(Vector:new(x, y))
+    end
+
+    if not status then
+        grabhelper(mousePosition)
+    end
+end
+
+function love.mousereleased(x, y)
+    local mousePosition = Vector(x, y)
+
+    for _, entity in ipairs(entities) do
+        local snapPoint = entity:getSnapPoint()
+        if snapPoint ~= nil and snapPoint:containsPoint(mousePosition) then
+            hoveredSnapPoint = snapPoint
+        end
+    end
+
+    if grab.grabbedCard ~= nil then
+        grab:ungrab(mousePosition, hoveredSnapPoint)
     end
 end
