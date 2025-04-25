@@ -1,0 +1,63 @@
+---@class SuitPile: Entity
+---@field position Vector
+---@field suit Suit
+---@field cards Card[]
+---@field snapPoint SnapPoint
+SuitPile = {}
+SuitPile.mt = {__index=SuitPile}
+setmetatable(SuitPile, Entity.mt)
+
+SuitPileSnapPoint = {}
+SuitPileSnapPoint.mt = {__index=SuitPileSnapPoint}
+setmetatable(SuitPileSnapPoint, SnapPoint.mt)
+
+SUIT_PILE_ICON_COLOR = {
+    [SUITS.SPADES] = {0.050980392156862744, 0.27058823529411763, 0.07058823529411765},
+    [SUITS.CLUBS] = {0.050980392156862744, 0.27058823529411763, 0.07058823529411765},
+    [SUITS.HEARTS] = {0.08235294117647059, 0.3607843137254902, 0.10588235294117647},
+    [SUITS.DIAMONDS] = {0.08235294117647059, 0.3607843137254902, 0.10588235294117647},
+}
+
+SUIT_PILE_EMPTY_BG_COLOR = {0.050980392156862744, 0.27058823529411763, 0.07058823529411765}
+
+function SuitPile:new(suit, position)
+    local pile = {}
+    setmetatable(pile, SuitPile.mt)
+    pile.suit = suit
+    pile.position = position
+    pile.cards = {}
+    pile.snapPoint = SnapPoint:new(pile.position);
+
+    return pile
+end
+
+function SuitPile:draw(dt)
+    love.graphics.push()
+    love.graphics.translate(self.position.x, self.position.y)
+
+    if #self.cards > 0 then
+        for i, card in ipairs(self.cards) do
+            card:draw(Vector:new(0, (i - 1) * DECK_CARD_SEPERATION), dt, true)
+        end
+    else
+        love.graphics.setColor(SUIT_PILE_EMPTY_BG_COLOR)
+        love.graphics.setLineWidth(4)
+        love.graphics.rectangle("line", 0, 0, 64, 96, 6, 6)
+        love.graphics.setColor(SUIT_PILE_ICON_COLOR[self.suit])
+        love.graphics.draw(Card.sprites[self.suit], 24, 40, 0, 2, 2)
+    end
+
+    love.graphics.pop()
+end
+
+function SuitPile:update(dt)
+    if #self.cards > 0 then
+        self.snapPoint.position = Vector:new(self.position.x, self.position.y + #self.cards * DECK_CARD_SEPERATION)
+    else
+        self.snapPoint.position = self.position
+    end
+end
+
+function SuitPile:getSnapPoint()
+    return self.snapPoint
+end

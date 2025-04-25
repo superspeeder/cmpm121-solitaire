@@ -9,7 +9,7 @@
 ---@operator div(number): Vector
 ---@operator unm: Vector
 
-Vector = {}
+Vector = {x=0,y=0}
 
 
 function Vector:new(x, y)

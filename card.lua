@@ -1,6 +1,16 @@
+---@class Card
+---@field suit Suit
+---@field rank integer
 Card = {width = 64, height = 96}
 Card.mt = {__index=Card}
 
+local CARD_FACEUP_BG = {1,1,1,1}
+local CARD_FACEDOWN_BG = {0.8392156862745098, 0.30980392156862746, 0.30980392156862746,1}
+local CARD_SHADOW = {0,0,0,0.2}
+local CARD_BORDER = {0,0,0,1}
+
+
+---@enum Suit
 SUITS = {
     HEARTS = 1,
     SPADES = 2,
@@ -46,10 +56,9 @@ function Card.setupSprites()
     Card.font = love.graphics.newFont(18);
 end
 
-function Card:new(position, suit, rank)
+function Card:new(suit, rank)
     local o = {}
     setmetatable(o, Card.mt)
-    o.position = position
     o.suit = suit
     o.rank = rank
     return o
@@ -58,24 +67,68 @@ end
 function Card:update(dt)
 end
 
-function Card:draw(dt)
-    love.graphics.setColor(1.0, 1.0, 1.0, 1.0)
-    love.graphics.rectangle("fill", self.position.x, self.position.y, self.width, self.height, 6, 6)
+---Draw a card at a position
+---@param position Vector
+---@param dt number
+---@param faceUp boolean
+---@param shadowOffset number? Y-offset of the shadow. Used to render held cards with more shadow
+function Card:draw(position, dt, faceUp, shadowOffset)
+    love.graphics.setColor(CARD_SHADOW)
+    love.graphics.rectangle("fill", position.x, position.y + (shadowOffset or 4), self.width, self.height, 6, 6)
 
-    love.graphics.push();
-    love.graphics.translate(self.position.x + self.width / 2, self.position.y + self.height / 2);
-    for _, position in ipairs(PATTERNS[self.rank]) do
-        love.graphics.draw(self.sprites[self.suit], position.x, position.y);
+    if faceUp then
+        love.graphics.setColor(CARD_FACEUP_BG)
+        love.graphics.rectangle("fill", position.x, position.y, self.width, self.height, 6, 6)
+            
+        love.graphics.setColor(COLORS[self.suit]);
+
+        love.graphics.push();
+        love.graphics.translate(position.x + self.width / 2, position.y + self.height / 2);
+        for _, inner_position in ipairs(PATTERNS[self.rank]) do
+            love.graphics.draw(self.sprites[self.suit], inner_position.x, inner_position.y);
+        end
+    
+        love.graphics.setFont(self.font);
+        love.graphics.printf(RANK_NAMES[self.rank], -28, -44, 100, "left");
+        love.graphics.printf(RANK_NAMES[self.rank], -72, 24, 100, "right");
+    
+        love.graphics.pop();
+    else
+        love.graphics.setColor(CARD_FACEDOWN_BG)
+        love.graphics.rectangle("fill", position.x, position.y, self.width, self.height, 6, 6)
     end
 
-    love.graphics.setFont(self.font);
-    love.graphics.setColor(COLORS[self.suit]);
-    love.graphics.printf(RANK_NAMES[self.rank], -28, -44, 100, "left");
-    love.graphics.printf(RANK_NAMES[self.rank], -72, 24, 100, "right");
+    love.graphics.setColor(CARD_BORDER)
+    love.graphics.setLineWidth(2)
+    love.graphics.rectangle("line", position.x, position.y, self.width, self.height, 6, 6)
 
-    love.graphics.pop();
 end
 
 function Card:canStackOnTopOf(other)
     return (self.suit % 2 ~= other.suit % 2) and other.rank - self.rank == 1
+end
+
+---@class PlacedCard: Entity
+---@field card Card
+---@field position Vector
+---@field faceUp boolean
+PlacedCard = {}
+PlacedCard.mt = {__index=PlacedCard}
+setmetatable(PlacedCard, Entity.mt)
+
+function PlacedCard:new(card, position)
+    local placedCard = {}
+    setmetatable(placedCard, PlacedCard.mt)
+    placedCard.card = card
+    placedCard.position = position
+    placedCard.faceUp = false
+    return placedCard
+end
+
+function PlacedCard:update(dt)
+    self.card:update(dt)
+end
+
+function PlacedCard:draw(dt)
+    self.card:draw(self.position, dt, self.faceUp)
 end
