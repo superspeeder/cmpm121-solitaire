@@ -113,29 +113,3 @@ end
 function Card:canStackOnTopOf(other)
     return (self.suit % 2 ~= other.suit % 2) and other.rank - self.rank == 1
 end
-
----@class PlacedCard: Entity
----@field card Card
----@field position Vector
----@field faceUp boolean
-PlacedCard = {}
-PlacedCard.mt = {__index=PlacedCard}
-setmetatable(PlacedCard, Entity.mt)
-
-function PlacedCard:new(card, position)
-    local placedCard = {}
-    setmetatable(placedCard, PlacedCard.mt)
-    placedCard.card = card
-    placedCard.position = position
-    placedCard.faceUp = false
-    return placedCard
-end
-
-function PlacedCard:update(dt)
-    self.card:update(dt)
-end
-
-function PlacedCard:draw(dt)
-    self.card:draw(self.position, dt, self.faceUp)
-end
-

@@ -98,10 +98,12 @@ end
 function grabhelper(mousePosition)
     for _, entity in ipairs(entities) do
         local eGrabPoints = entity:getGrabPoints()
-        for _, gp in ipairs(eGrabPoints) do
-            if gp:canGrabFrom(mousePosition) then
-                grab:grab(gp, mousePosition)
-                return
+        if eGrabPoints ~= nil then
+            for _, gp in ipairs(eGrabPoints) do
+                if gp:canGrabFrom(mousePosition) then
+                    grab:grab(gp, mousePosition)
+                    return
+                end
             end
         end
     end

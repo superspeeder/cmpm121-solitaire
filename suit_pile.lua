@@ -76,6 +76,27 @@ function SuitPile:getTopRank()
     end
 end
 
+function SuitPile:getGrabPoints()
+    if #self.cards > 0 then
+        return {GenericGrabPoint:new(self, self.position + Vector(0, DECK_CARD_SEPERATION * (#self.cards - 1)))}
+    end
+end
+
+function SuitPile:grab(point)
+    local card = self.cards[#self.cards]
+    table.remove(self.cards, #self.cards)
+    return card
+end
+
+function SuitPile:revertGrab(grabObject)
+    table.insert(self.cards, grabObject)
+end
+
+function SuitPile:resolveGrab() -- unlike the other things, there is no recurring logic for the suit piles that must be resumed when a grab resolves
+end
+
+
+
 function SuitPileSnapPoint:new(position, pile)
     local sp = {}
     setmetatable(sp, SuitPileSnapPoint.mt)
