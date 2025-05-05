@@ -9,8 +9,6 @@ Tableau = {}
 Tableau.mt = {__index=Tableau}
 setmetatable(Tableau, Entity.mt)
 
-STACK_SEPERATION = 20
-
 ---@class TableauEntry
 ---@field card Card
 ---@field faceUp boolean

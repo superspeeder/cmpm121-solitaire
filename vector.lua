@@ -11,7 +11,6 @@
 
 Vector = {x=0,y=0}
 
-
 function Vector:new(x, y)
     local o = {}
     setmetatable(o, Vector.mt)

@@ -4,8 +4,6 @@
 SnapPoint = {}
 SnapPoint.mt = {__index=SnapPoint}
 
-SNAP_POINT_OVERLAY_COLOR = {0,0,0,0.2}
-
 function SnapPoint:new(position)
     local snapPoint = {}
     setmetatable(snapPoint, SnapPoint.mt)

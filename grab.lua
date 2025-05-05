@@ -4,8 +4,6 @@
 Grab = {}
 Grab.mt = {__index=Grab}
 
-GRAB_JUMP = 10
-
 setmetatable(Grab, Entity.mt)
 
 function Grab:new()

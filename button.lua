@@ -7,9 +7,6 @@ Button = {}
 Button.mt = {__index=Button}
 setmetatable(Button, Entity.mt)
 
-local PADDING = 6
-local BUTTON_OUTLINE_COLOR = {1,1,1}--{0.050980392156862744, 0.27058823529411763, 0.07058823529411765}
-local BUTTON_FILL_COLOR = {0.8392156862745098, 0.30980392156862746, 0.30980392156862746,1}
 
 function Button:new(position, text, onClick)
     local o = {}
@@ -26,10 +23,10 @@ function Button:draw(dt)
     love.graphics.translate(self.position.x, self.position.y)
     love.graphics.setLineWidth(3)
     love.graphics.setColor(BUTTON_FILL_COLOR)
-    love.graphics.rectangle("fill", 0, 0, self.size.x + PADDING * 2, self.size.y + PADDING * 2)
+    love.graphics.rectangle("fill", 0, 0, self.size.x + BUTTON_PADDING * 2, self.size.y + BUTTON_PADDING * 2)
     love.graphics.setColor(BUTTON_OUTLINE_COLOR)
-    love.graphics.rectangle("line", 0, 0, self.size.x + PADDING * 2, love.graphics.getFont():getHeight() + PADDING * 2)
-    love.graphics.print(self.text, PADDING, PADDING);
+    love.graphics.rectangle("line", 0, 0, self.size.x + BUTTON_PADDING * 2, love.graphics.getFont():getHeight() + BUTTON_PADDING * 2)
+    love.graphics.print(self.text, BUTTON_PADDING, BUTTON_PADDING);
     love.graphics.pop()
 end
 

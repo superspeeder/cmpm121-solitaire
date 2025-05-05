@@ -1,5 +1,3 @@
-DRAW_PILE_CARD_SEPERATION = 48
-
 ---unlike most of the other piles, this one will be more flat and only render the top 3 cards of the pile (to prevent any weird layout issues)
 ---@class DrawPile: Entity
 ---@field cards Card[]

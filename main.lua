@@ -1,4 +1,4 @@
-require("magic") 
+require("const")
 require("vector")
 require("entity")
 require("card")
@@ -10,7 +10,6 @@ require("tableau")
 require("suit_pile")
 require("button")
 
-GAME_BACKGROUND = {0.0784313725490196, 0.4392156862745098, 0.10980392156862745}
 
 ---@type Entity[]
 local entities = {}
@@ -22,12 +21,7 @@ local deckEntity = nil
 local hoveredSnapPoint = nil
 
 ---@type SuitPile[]
-local suitPiles = {
-    [SUITS.HEARTS] = SuitPile:new(SUITS.HEARTS, Vector:new(650, 100)),
-    [SUITS.DIAMONDS] = SuitPile:new(SUITS.DIAMONDS, Vector:new(650, 210)),
-    [SUITS.SPADES] = SuitPile:new(SUITS.SPADES, Vector:new(650, 320)),
-    [SUITS.CLUBS] = SuitPile:new(SUITS.CLUBS, Vector:new(650, 420))
-}
+local suitPiles = nil
 
 ---@type DrawPile
 local drawPile = nil
@@ -40,6 +34,13 @@ local resetButton = nil
 function resetState()
     entities = {}
     grab = Grab:new()
+
+    suitPiles = {
+        [SUITS.HEARTS] = SuitPile:new(SUITS.HEARTS, Vector:new(650, 100)),
+        [SUITS.DIAMONDS] = SuitPile:new(SUITS.DIAMONDS, Vector:new(650, 210)),
+        [SUITS.SPADES] = SuitPile:new(SUITS.SPADES, Vector:new(650, 320)),
+        [SUITS.CLUBS] = SuitPile:new(SUITS.CLUBS, Vector:new(650, 420))
+    }
 
     drawPile = DrawPile:new(Vector:new(130, 100))
     table.insert(entities, drawPile)

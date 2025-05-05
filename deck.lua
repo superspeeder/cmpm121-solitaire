@@ -4,8 +4,6 @@
 Deck = {}
 Deck.mt = {__index=Deck}
 
-DECK_CARD_SEPERATION = -1
-
 ---Create a new deck (unshuffled)
 ---@param drawPile DrawPile
 ---@return Deck
