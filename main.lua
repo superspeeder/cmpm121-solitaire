@@ -8,6 +8,7 @@ require("draw_pile")
 require("deck")
 require("tableau")
 require("suit_pile")
+require("button")
 
 GAME_BACKGROUND = {0.0784313725490196, 0.4392156862745098, 0.10980392156862745}
 
@@ -22,10 +23,10 @@ local hoveredSnapPoint = nil
 
 ---@type SuitPile[]
 local suitPiles = {
-    [SUITS.HEARTS] = SuitPile:new(SUITS.HEARTS, Vector:new(650, 50)),
-    [SUITS.DIAMONDS] = SuitPile:new(SUITS.DIAMONDS, Vector:new(650, 160)),
-    [SUITS.SPADES] = SuitPile:new(SUITS.SPADES, Vector:new(650, 270)),
-    [SUITS.CLUBS] = SuitPile:new(SUITS.CLUBS, Vector:new(650, 380))
+    [SUITS.HEARTS] = SuitPile:new(SUITS.HEARTS, Vector:new(650, 100)),
+    [SUITS.DIAMONDS] = SuitPile:new(SUITS.DIAMONDS, Vector:new(650, 210)),
+    [SUITS.SPADES] = SuitPile:new(SUITS.SPADES, Vector:new(650, 320)),
+    [SUITS.CLUBS] = SuitPile:new(SUITS.CLUBS, Vector:new(650, 420))
 }
 
 ---@type DrawPile
@@ -34,28 +35,27 @@ local drawPile = nil
 ---@type Grab
 local grab = nil
 
-function love.load()
-    love.graphics.setDefaultFilter("nearest", "nearest")
+local resetButton = nil
 
-    Card.setupSprites()
-
+function resetState()
+    entities = {}
     grab = Grab:new()
 
-    drawPile = DrawPile:new(Vector:new(130, 50))
+    drawPile = DrawPile:new(Vector:new(130, 100))
     table.insert(entities, drawPile)
 
     local deck = Deck:new(drawPile)
     deck:shuffle();
 
-    table.insert(entities, DeckEntity:new(deck, Vector:new(50, 50)))
+    table.insert(entities, DeckEntity:new(deck, Vector:new(50, 100)))
 
-    table.insert(entities, Tableau:newFromHeight(1, deck, Vector:new(50, 200)))
-    table.insert(entities, Tableau:newFromHeight(2, deck, Vector:new(130, 200)))
-    table.insert(entities, Tableau:newFromHeight(3, deck, Vector:new(210, 200)))
-    table.insert(entities, Tableau:newFromHeight(4, deck, Vector:new(290, 200)))
-    table.insert(entities, Tableau:newFromHeight(5, deck, Vector:new(370, 200)))
-    table.insert(entities, Tableau:newFromHeight(6, deck, Vector:new(450, 200)))
-    table.insert(entities, Tableau:newFromHeight(7, deck, Vector:new(530, 200)))
+    table.insert(entities, Tableau:newFromHeight(1, deck, Vector:new(50, 250)))
+    table.insert(entities, Tableau:newFromHeight(2, deck, Vector:new(130, 250)))
+    table.insert(entities, Tableau:newFromHeight(3, deck, Vector:new(210, 250)))
+    table.insert(entities, Tableau:newFromHeight(4, deck, Vector:new(290, 250)))
+    table.insert(entities, Tableau:newFromHeight(5, deck, Vector:new(370, 250)))
+    table.insert(entities, Tableau:newFromHeight(6, deck, Vector:new(450, 250)))
+    table.insert(entities, Tableau:newFromHeight(7, deck, Vector:new(530, 250)))
 
     table.insert(entities, suitPiles[SUITS.HEARTS]);
     table.insert(entities, suitPiles[SUITS.SPADES]);
@@ -63,6 +63,18 @@ function love.load()
     table.insert(entities, suitPiles[SUITS.CLUBS]);
 
     table.insert(entities, grab)
+
+    table.insert(entities, resetButton)
+end
+
+function love.load()
+    love.graphics.setDefaultFilter("nearest", "nearest")
+
+    Card.setupSprites()
+
+    resetButton = Button:new(Vector:new(650, 50), "Reset", function() resetState() end);
+
+    resetState()
 
     love.graphics.setBackgroundColor(GAME_BACKGROUND)
 end
@@ -102,11 +114,13 @@ function grabhelper(mousePosition)
             for _, gp in ipairs(eGrabPoints) do
                 if gp:canGrabFrom(mousePosition) then
                     grab:grab(gp, mousePosition)
-                    return
+                    return true
                 end
             end
         end
     end
+
+    return false
 end
 
 function love.mousepressed(x, y)
@@ -130,7 +144,16 @@ function love.mousepressed(x, y)
     end
 
     if not status then
-        grabhelper(mousePosition)
+        status = grabhelper(mousePosition)
+    end
+
+    if not status then
+        for _, entity in ipairs(entities) do
+            if entity:click(mousePosition) then
+                status = true
+                break
+            end
+        end
     end
 end
 
