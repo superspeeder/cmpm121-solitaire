@@ -31,6 +31,11 @@ local grab = nil
 
 local resetButton = nil
 
+local hasWon = false
+
+local newGameButton = nil
+local quitButton = nil
+
 function resetState()
     entities = {}
     grab = Grab:new()
@@ -74,6 +79,8 @@ function love.load()
     Card.setupSprites()
 
     resetButton = Button:new(Vector:new(650, 50), "Reset", function() resetState() end);
+    newGameButton = Button:new(Vector(250, 350), "New Game", function() resetState(); hasWon = false; end)
+    quitButton = Button:new(Vector(450, 350), "Quit", function() love.event.quit() end)
 
     resetState()
 
@@ -81,6 +88,18 @@ function love.load()
 end
 
 function love.update(dt)
+    local finishedPiles = 0;
+    for _, sp in ipairs(suitPiles) do
+        if sp:getTopRank() == 13 then
+            finishedPiles = finishedPiles + 1;
+        end
+    end
+
+    if finishedPiles == 4 then
+        hasWon = true
+        return
+    end
+
     for _, entity in ipairs(entities) do
         entity:update(dt)
     end
@@ -106,6 +125,10 @@ function love.draw(dt)
     if hoveredSnapPoint ~= nil and grab.grabbedCard ~= nil then
         hoveredSnapPoint:drawOverlay()
     end
+
+    if hasWon then
+        drawWinScreen()
+    end
 end
 
 function grabhelper(mousePosition)
@@ -125,12 +148,19 @@ function grabhelper(mousePosition)
 end
 
 function love.mousepressed(x, y)
+    local mousePosition = Vector(x, y)
+
+    if hasWon then
+        newGameButton:click(mousePosition)
+        quitButton:click(mousePosition)
+        return
+    end
+
     if grab.grabbedCard ~= nil then
         return -- if we are holding a card, do nothing
     end
 
 
-    local mousePosition = Vector(x, y)
 
     for _, entity in ipairs(entities) do
         local snapPoint = entity:getSnapPoint()
@@ -159,6 +189,8 @@ function love.mousepressed(x, y)
 end
 
 function love.mousereleased(x, y)
+    if hasWon then return end
+
     local mousePosition = Vector(x, y)
 
     for _, entity in ipairs(entities) do
@@ -172,3 +204,14 @@ function love.mousereleased(x, y)
         grab:ungrab(mousePosition, hoveredSnapPoint)
     end
 end
+
+function drawWinScreen()
+    love.graphics.setColor(0,0,0,0.5)
+    love.graphics.rectangle("fill", 0, 0, love.graphics.getWidth(), love.graphics.getHeight())
+
+    newGameButton:draw()
+    quitButton:draw()
+
+    love.graphics.print("You Win!", 350 - love.graphics.getFont():getWidth("You Win!") / 2, 200, 0, 2, 2);
+end
+

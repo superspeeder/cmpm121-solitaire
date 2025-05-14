@@ -1,17 +1,19 @@
 ---@class Action
----@field movedObject
----@field sourcePoint
----@field endPoint
+---@field movedObject Card | Tableau
+---@field sourcePoint GrabPoint
+---@field endPoint SnapPoint
+---@field flippedCard boolean
 Action = {}
 Action.mt = {__index=Action}
 
 
-function Action:new(movedObject, sourcePoint, endPoint)
+function Action:new(movedObject, sourcePoint, endPoint, flippedCard)
     local o = {}
     setmetatable(o, Action.mt)
     o.movedObject = movedObject
     o.sourcePoint = sourcePoint
     o.endPoint = endPoint
+    o.flippedCard = flippedCard
     return o
 end
 
@@ -19,14 +21,14 @@ end
 
 ---Do the action
 function Action:run()
-    self.endPoint.place(self.movedObject)
-    self.sourcePoint.take(self.movedObject)
+    self.endPoint:placeCard(self.movedObject)
+    self.sourcePoint:take(self.movedObject)
 end
 
 ---Undo the action
 function Action:undo()
-    self.sourcePoint.place(self.movedObject)
-    self.endPoint.take(self.movedObject)
+    self.sourcePoint:placeCard(self.movedObject)
+    self.endPoint:take(self.movedObject)
 end
 
 

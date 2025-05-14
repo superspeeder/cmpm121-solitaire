@@ -19,6 +19,8 @@ function Button:new(position, text, onClick)
 end
 
 function Button:draw(dt)
+    self.size = Vector:new(love.graphics.getFont():getWidth(self.text), love.graphics.getFont():getHeight())
+
     love.graphics.push()
     love.graphics.translate(self.position.x, self.position.y)
     love.graphics.setLineWidth(3)
