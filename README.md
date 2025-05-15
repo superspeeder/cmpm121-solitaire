@@ -32,3 +32,5 @@ I also think I could've structured some stuff better, but for the scope of this 
 
 All assets made by me! (except for font, I just use the default and I don't know if that is pre-packaged in love2d or if it just uses a system font, either way I didn't make that).
 
+## Packaged Version
+I'm making a release for this version (like I did for version 1). I am going to add the `.love` file in the files for that.
